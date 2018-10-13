@@ -35,10 +35,24 @@ public class Calculator {
                         return;
 
                     int timesFitInDelta = apRemaining.intValue() / apEvent.getIncreaseAmount();
-                    int sievedTimes = sieveApEvents(apEvent, timesFitInDelta, SIMILAR_ACTIONS_SIEVE_PERCENTAGE);
+                    int sievedTimes;
+                    // If it fits perfectly, do not sieve it. Be perfectionist. :)
+                    if (timesFitInDelta * apEvent.getIncreaseAmount() == apRemaining.intValue())
+                        sievedTimes = timesFitInDelta;
+                    else
+                        sievedTimes = sieveApEvents(apEvent, timesFitInDelta, SIMILAR_ACTIONS_SIEVE_PERCENTAGE);
 
-                    result.put(apEvent, sievedTimes);
-                    apRemaining.set(apRemaining.get() - sievedTimes * apEvent.getIncreaseAmount());
+
+                    long nextApRemaining = apRemaining.get() - sievedTimes * apEvent.getIncreaseAmount();
+                    int lastDigitBefore = apRemaining.intValue() % 10;
+                    int lastDigitAfter = (int)nextApRemaining % 10;
+
+                    // We shall not reduce accuracy. I.e. If user has 400 apRemaining and we tell him to cast one link for 313 ap,
+                    // he will freak out with remaining 87 ap. Let's not do that.
+                    if (lastDigitAfter <= lastDigitBefore) {
+                        result.put(apEvent, sievedTimes);
+                        apRemaining.set(nextApRemaining);
+                    }
                 });
 
         return new Results(result, apRemaining.get());
@@ -50,5 +64,4 @@ public class Calculator {
         }
         return amount;
     }
-
 }
