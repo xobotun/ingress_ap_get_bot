@@ -23,18 +23,32 @@ public class Calculator {
      * @param apDesired AP count user wants to reach
      * @return {@link Results} containing detailed plan on how to achieve users goal.
      */
-    public Results calculate(long apNow, long apDesired) {
-        final AtomicLong delta = new AtomicLong(apDesired - apNow);
+    public static Results calculate(long apNow, long apDesired) {
+        final AtomicLong apRemaining = new AtomicLong(apDesired - apNow);
         final Map<ApEvent, Integer> result = new EnumMap<>(ApEvent.class);
 
         Arrays.stream(ApEvent.values())
                 .filter(apEvent -> true)    // There may be some options in the future...
                 .sorted(Comparator.comparingInt(ApEvent::getIncreaseAmount).reversed())
-                .peek(apEvent -> {
+                .forEach(apEvent -> {
+                    if (apEvent.getIncreaseAmount() > apRemaining.get())
+                        return;
 
+                    int timesFitInDelta = apRemaining.intValue() / apEvent.getIncreaseAmount();
+                    int sievedTimes = sieveApEvents(apEvent, timesFitInDelta, SIMILAR_ACTIONS_SIEVE_PERCENTAGE);
+
+                    result.put(apEvent, sievedTimes);
+                    apRemaining.set(apRemaining.get() - sievedTimes * apEvent.getIncreaseAmount());
                 });
 
-        return new Results(result, delta.get());
+        return new Results(result, apRemaining.get());
+    }
+
+    private static int sieveApEvents(ApEvent event, int amount, int sievePercentage) {
+        if (amount > 1 && event.isApplySieve()) {
+            amount = sievePercentage * amount / 100;   // I hope there won't be number of attempts greater than 0x7FFFFFFF / sievePercentage. %)
+        }
+        return amount;
     }
 
 }

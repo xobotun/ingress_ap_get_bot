@@ -9,15 +9,15 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ApEvent {
-    PORTAL_RECHARGE(10),
-    RESONATOR_UPGRADE(65),
-    HACK(100),
-    RESONATOR_DEPLOY(125),
-    MOD_INSTALL(125),
-    CREATE_LINK(313),
-    FIRST_RESONATOR_DEPLOY(500 + 125),
-    CONTROL_FIELD_CREATE(1250),
-    PORTAL_CAPTURE(500 + 325 + 125 * 8);
+    PORTAL_RECHARGE(10, false),
+    RESONATOR_UPGRADE(65, true),
+    HACK(100, true),
+    RESONATOR_DEPLOY(125, true),
+    MOD_INSTALL(125, true),
+    CREATE_LINK(313, true),
+    FIRST_RESONATOR_DEPLOY(500 + 125, true),
+    CONTROL_FIELD_CREATE(1250 + 313, true),   // with at least one link
+    PORTAL_CAPTURE(500 + 325 + 125 * 8, true);
     // Hard to use IRL, decided to exclude them.
 //    LAST_RESONATOR_DEPLOY(325 + 125);
 //    CONTROL_FIELD_DESTROY(750),
@@ -27,4 +27,5 @@ public enum ApEvent {
      * How much users AP should increase under normal circumstanses.
      */
     int increaseAmount;
+    boolean applySieve;
 }
