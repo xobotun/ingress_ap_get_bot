@@ -43,7 +43,7 @@ class ApGetBot {
     }
 
     private static void sendMessage(long chatId, String text) {
-        String token = "691111851:AAEKsz5at1ezfixJbenXV8OCEM5BVhRpiKw";
+        String token = "no-token";
         String urlForLogging = "null";
         try {
         val request = Unirest.get(String.format("https://api.telegram.org/bot%s/sendMessage", token))
