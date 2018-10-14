@@ -78,11 +78,11 @@ class ApGetBot {
             urlForLogging = request.getUrl();
             val response = request.asString(); // send it
             if (response.getStatus() != 200) {
-                log.info(String.format("%d %s %s", response.getStatus(), response.getStatusText(), response.getBody()));
-                log.info(urlForLogging);
+                log.warn(String.format("%d %s %s", response.getStatus(), response.getStatusText(), response.getBody()));
+                log.warn(urlForLogging);
             }
         } catch (UnirestException e) {
-            log.info(String.format("Could not send request to %s", urlForLogging));
+            log.warn(String.format("Could not send request to %s", urlForLogging));
         }
     }
 
