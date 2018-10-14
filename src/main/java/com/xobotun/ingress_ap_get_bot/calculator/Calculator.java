@@ -14,7 +14,7 @@ public class Calculator {
      * lets leave only some of these repetitive actions.
      * With 0.8 coefficient and 40 of the same actions there will only 32 remaining.
      */
-    public static final int SIMILAR_ACTIONS_SIEVE_PERCENTAGE = 80;
+    public static final int SIMILAR_ACTIONS_SIEVE_PERCENTAGE = 90;
 
     /**
      * Calculates plan for achieveing desired AP value.

@@ -98,7 +98,7 @@ class ApGetBot {
 
         if (result.getApNotDistributed() > 0) {
             int lastDigitShouldBe = (int) (apCountLesser % 10 + result.getApNotDistributed()) % 10;
-            response.append(String.format("First, consider glyphing until your AP ends with `%d` digit.\n" +
+            response.append(String.format("First, consider glyphing until your AP ends with digit `%d`.\n" +
                                           "Anyway, your next steps will be like:\n\n", lastDigitShouldBe));
         } else {
             response.append("You just need to\n\n");
