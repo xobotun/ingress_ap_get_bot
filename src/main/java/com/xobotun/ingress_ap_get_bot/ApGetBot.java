@@ -6,6 +6,7 @@ import com.xobotun.ingress_ap_get_bot.calculator.Calculator;
 import com.xobotun.ingress_ap_get_bot.calculator.Results;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
@@ -24,13 +25,25 @@ class ApGetBot {
     }
 
     public static String processCommand(Request request, Response response) {
+        log.info(request.body());
+
         JSONObject body = new JSONObject(request.body());
 
-        String text = body.getJSONObject("message").getString("text");
-        long chatId = body.getJSONObject("message").getJSONObject("chat").getLong("id");
-        String username = body.getJSONObject("message").getJSONObject("from").getString("username");
-
-
+        String text;
+        long chatId;
+        try {
+            text = body.getJSONObject("message").getString("text");
+            chatId = body.getJSONObject("message").getJSONObject("chat").getLong("id");
+        } catch (JSONException e) {
+            try {
+                text = body.getJSONObject("edited_message").getString("text");
+                chatId = body.getJSONObject("edited_message").getJSONObject("chat").getLong("id");
+            } catch (JSONException e2) {
+                if (request.body().contains("Rovragge"))
+                    sendMessage(165518764, "Привет, @Rovragge!\nОпять ты с картинками/голосовухами/стикерами?..\n\nДавай я лучше тебя няфферку подсчитаю...");
+                return "Rovragged!";
+            }
+        }
 
         if (text.startsWith("/start")) {
             sendMessage(chatId, getGreetings());
@@ -57,13 +70,17 @@ class ApGetBot {
         String token = "no-token";
         String urlForLogging = "null";
         try {
-        val request = Unirest.get(String.format("https://api.telegram.org/bot%s/sendMessage", token))
-                .queryString("chat_id", Long.toString(chatId))
-                .queryString("text", text)
-                .queryString("parse_mode", "Markdown");
+            val request = Unirest.get(String.format("https://api.telegram.org/bot%s/sendMessage", token))
+                    .queryString("chat_id", Long.toString(chatId))
+                    .queryString("text", text)
+                    .queryString("parse_mode", "Markdown");
 
-        urlForLogging = request.getUrl();
-        request.asString(); // send it
+            urlForLogging = request.getUrl();
+            val response = request.asString(); // send it
+            if (response.getStatus() != 200) {
+                log.info(String.format("%d %s %s", response.getStatus(), response.getStatusText(), response.getBody()));
+                log.info(urlForLogging);
+            }
         } catch (UnirestException e) {
             log.info(String.format("Could not send request to %s", urlForLogging));
         }
@@ -89,6 +106,9 @@ class ApGetBot {
     private static String calculateApDelta(String text) {
         String[] tokens = text.replaceAll("\\s{2}", " ").trim().split(" ");     // never can be too much escaping
 
+        if (tokens.length < 3)
+            return "Мне надо посчитать разницу между текущим АП и требуемым, а их пришло как-то мало. :(";
+
         //#region validate input
         long apCountLesser;
         long apCountGreater;
@@ -96,7 +116,7 @@ class ApGetBot {
             apCountLesser = Long.valueOf(tokens[1]);
             apCountGreater = Long.valueOf(tokens[2]);
         } catch (NumberFormatException e) {
-            return "Just for you to know, AP is represented by digits only.";
+            return "Эм-м-м... Кажется, тут интернет барахлит, мне почему-то вместо АП пришли ещё какие-то другие символы.";
         }
 
         if (apCountGreater < apCountLesser) {
@@ -108,7 +128,7 @@ class ApGetBot {
 
         Results result = Calculator.calculate(apCountLesser, apCountGreater);
         StringBuilder response = new StringBuilder(
-                String.format("Итак, у тебя сейчас `%d` АП и ты хочешь няфферку `%d` АП. Тебе надо получить `%d` АП! ^_^.\n\n",
+                String.format("Итак, у тебя сейчас `%d` АП и ты хочешь няфферку `%d` АП. Тебе надо получить `%d` АП! :3.\n\n",
                         apCountLesser,
                         apCountGreater,
                         apCountGreater - apCountLesser
