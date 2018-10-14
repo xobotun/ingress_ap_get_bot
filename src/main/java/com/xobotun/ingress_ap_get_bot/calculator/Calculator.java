@@ -28,7 +28,7 @@ public class Calculator {
         final Map<ApEvent, Integer> result = new EnumMap<>(ApEvent.class);
 
         Arrays.stream(ApEvent.values())
-                .filter(apEvent -> true)    // There may be some options in the future...
+                .filter(ApEvent::isUse)
                 .sorted(Comparator.comparingInt(ApEvent::getIncreaseAmount).reversed())
                 .forEach(apEvent -> {
                     if (apEvent.getIncreaseAmount() > apRemaining.get())
