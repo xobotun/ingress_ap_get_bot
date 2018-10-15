@@ -1,0 +1,22 @@
+[Unit]
+Description=Ingress AP Get Telegram Bot
+After=nginx.service
+
+[Service]
+Type=simple
+PIDFile=/home/nginx/ingress-ap-get-bot.xobotun.com/service.pid
+WorkingDirectory=/home/nginx/ingress-ap-get-bot.xobotun.com
+
+User=nginx
+Group=nginx
+
+SyslogIdentifier=IngressAPBot
+ExecStart=/bin/sh -c "exec java -jar /home/nginx/ingress-ap-get-bot.xobotun.com/ingress-ap-get-bot_full-1.1.0.jar"
+#ExecStop=/usr/local/bin/bundle exec service -S /work/www/myunit/shared/tmp/pids/service.state stop
+#ExecReload=/usr/local/bin/bundle exec service -S /work/www/myunit/shared/tmp/pids/service.state restart
+TimeoutSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+#Put me in /etc/systemd/system/

@@ -35,14 +35,8 @@ class ApGetBot {
             text = body.getJSONObject("message").getString("text");
             chatId = body.getJSONObject("message").getJSONObject("chat").getLong("id");
         } catch (JSONException e) {
-            try {
-                text = body.getJSONObject("edited_message").getString("text");
-                chatId = body.getJSONObject("edited_message").getJSONObject("chat").getLong("id");
-            } catch (JSONException e2) {
-                if (request.body().contains("Rovragge"))
-                    sendMessage(165518764, "Привет, @Rovragge!\nОпять ты с картинками/голосовухами/стикерами?..\n\nДавай я лучше тебя няфферку подсчитаю...");
-                return "Rovragged!";
-            }
+            text = body.getJSONObject("edited_message").getString("text");
+            chatId = body.getJSONObject("edited_message").getJSONObject("chat").getLong("id");
         }
 
         if (text.startsWith("/start")) {
