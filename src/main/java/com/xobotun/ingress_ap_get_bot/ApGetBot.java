@@ -130,7 +130,8 @@ class ApGetBot {
         );
 
         if (result.getApNotDistributed() > 0) {
-            int lastDigitShouldBe = (int) result.getApNotDistributed() % 5;
+            int lastDigitNow = (int) apCountLesser % 5;
+            int lastDigitShouldBe = (lastDigitNow + (int) result.getApNotDistributed() % 5) % 5;
             response.append(String.format("Во-первых, поглифуй порталы, пока твоё АП не будет заканчиваться на цифру `%d` или `%d`.\n" +
                                           "А потом обратись ко мне, я тебе пересчитаю шаги до няфферки. Я люблю это делать! :3\n" +
                                           "Твой план будет такой:\n\n", lastDigitShouldBe, lastDigitShouldBe + 5));
