@@ -180,15 +180,18 @@ class ApGetBot {
             response.append("Делай так и у тебя всё получится!\n");
         }
 
+        final double finalMultiplier = multiplier;
         result.getNumOfEvents().entrySet().stream()
                 .sorted(Comparator.comparingInt(entry -> ((Map.Entry<ApEvent, Integer>)entry).getKey().getIncreaseAmount()).reversed())
                 .forEach(countedApEvent -> {
+                    int apIncrease = (int) (countedApEvent.getKey().getIncreaseAmount() * finalMultiplier);
+
                     response.append(String.format("• %s `%d` %s, чтобы получить `%d` АП (`%d` за штуку)\n",
                             ApEvent.getCalculationDescription(countedApEvent.getKey()),
                             countedApEvent.getValue(),
                             getTimesDeclination(countedApEvent.getValue()),
-                            countedApEvent.getKey().getIncreaseAmount() * countedApEvent.getValue(),
-                            countedApEvent.getKey().getIncreaseAmount()));
+                            apIncrease * countedApEvent.getValue(),
+                            apIncrease));
                 });
 
         return response.toString();
