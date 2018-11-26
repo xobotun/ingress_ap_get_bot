@@ -160,6 +160,10 @@ class ApGetBot {
         }
         // #endregion
 
+        if (apCountGreater - apCountLesser == 0) {
+            return "Какую няфферку получил! Молодчина!";
+        }
+
         Results result = Calculator.calculate(apCountLesser, apCountGreater, multiplier);
         StringBuilder response = new StringBuilder(
                 String.format("Итак, у тебя сейчас `%d` АП и ты хочешь няфферку `%d` АП. Тебе надо получить `%d` АП! :3.\n\n",

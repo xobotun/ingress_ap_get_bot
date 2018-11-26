@@ -11,7 +11,7 @@ User=nginx
 Group=nginx
 
 SyslogIdentifier=IngressAPBot
-ExecStart=/bin/sh -c "exec java -jar /home/nginx/ingress-ap-get-bot.xobotun.com/ingress-ap-get-bot_full-1.2.0.jar"
+ExecStart=/bin/sh -c "exec java -jar /home/nginx/ingress-ap-get-bot.xobotun.com/ingress-ap-get-bot_full-1.2.1.jar"
 #ExecStop=/usr/local/bin/bundle exec service -S /work/www/myunit/shared/tmp/pids/service.state stop
 #ExecReload=/usr/local/bin/bundle exec service -S /work/www/myunit/shared/tmp/pids/service.state restart
 TimeoutSec=5
