@@ -6,6 +6,18 @@ import com.xobotun.ingress_ap_get_bot.calculator.Calculator;
 import com.xobotun.ingress_ap_get_bot.calculator.Results;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.config.Lookup;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.impl.auth.BasicSchemeFactory;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -22,6 +34,21 @@ import static spark.Spark.*;
 
 @Slf4j
 class ApGetBot {
+    static {
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("username", "password"));
+        clientBuilder.useSystemProperties();
+        clientBuilder.setProxy(new HttpHost("host", 3128));
+        clientBuilder.setDefaultCredentialsProvider(credsProvider);
+        clientBuilder.setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
+        Lookup<AuthSchemeProvider> authProviders = RegistryBuilder.<AuthSchemeProvider>create()
+                .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                .build();
+        clientBuilder.setDefaultAuthSchemeRegistry(authProviders);
+        Unirest.setHttpClient(clientBuilder.build());
+    }
+
     public static void main(String[] args) {
         port(8088);
         post("/", ApGetBot::processCommand);
