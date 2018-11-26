@@ -11,8 +11,11 @@ import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
 
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 
 import static spark.Spark.*;
@@ -83,6 +86,7 @@ class ApGetBot {
     private static String getHelp() {
         return "`/help` — я всегда подскажу, как ко мне обратиться. :3\n" +
                "`/calc num1 num2` — то, для чего я и была создана – считать твои действия до няфферки. Просто укажи мне два числа – и я подскажу как пройти от одного к другому. :3\n" +
+               "`/calc num1 num2 mult` — если на этой неделе Нянтик ввели множитель АП, напиши его в конце, я не очень слежу за новостями. -_-'\n" +
                "`/list` — если тебе интересно, какие действия я умею учитывать при подсчёте АП до следующей няфферки.";
     }
 
@@ -118,9 +122,18 @@ class ApGetBot {
             apCountGreater = apCountLesser;
             apCountLesser = tmp;
         }
+
+        double multiplier = 1.0;
+        if (tokens.length == 4) {
+            try {
+                multiplier = NumberFormat.getInstance(Locale.ROOT).parse(tokens[3].replaceAll(",", ".")).doubleValue();
+            } catch (ParseException e) {
+                // Do nothing: default value is already set and this code succesfully parses 95% input.
+            }
+        }
         // #endregion
 
-        Results result = Calculator.calculate(apCountLesser, apCountGreater);
+        Results result = Calculator.calculate(apCountLesser, apCountGreater, multiplier);
         StringBuilder response = new StringBuilder(
                 String.format("Итак, у тебя сейчас `%d` АП и ты хочешь няфферку `%d` АП. Тебе надо получить `%d` АП! :3.\n\n",
                         apCountLesser,
@@ -132,6 +145,7 @@ class ApGetBot {
         if (result.getApNotDistributed() > 0) {
             int lastDigitNow = (int) apCountLesser % 5;
             int lastDigitShouldBe = (lastDigitNow + (int) result.getApNotDistributed() % 5) % 5;
+            if (lastDigitShouldBe == apCountLesser % 10) lastDigitShouldBe += 10;   // In case there is x2 multiplier and there is no way to get 10 AP.
             response.append(String.format("Во-первых, поглифуй порталы, пока твоё АП не будет заканчиваться на цифру `%d` или `%d`.\n" +
                                           "А потом обратись ко мне, я тебе пересчитаю шаги до няфферки. Я люблю это делать! :3\n" +
                                           "Твой план будет такой:\n\n", lastDigitShouldBe, lastDigitShouldBe + 5));

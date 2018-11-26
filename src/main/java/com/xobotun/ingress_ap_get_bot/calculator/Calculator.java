@@ -21,9 +21,10 @@ public class Calculator {
      * {@code apNow} should always be lesser or equal to {@code apDesired}
      * @param apNow AP count user has right now
      * @param apDesired AP count user wants to reach
+     * @param multiplier sometimes Niantic introduces AP muliplier
      * @return {@link Results} containing detailed plan on how to achieve users goal.
      */
-    public static Results calculate(long apNow, long apDesired) {
+    public static Results calculate(long apNow, long apDesired, double multiplier) {
         final AtomicLong apRemaining = new AtomicLong(apDesired - apNow);
         final Map<ApEvent, Integer> result = new EnumMap<>(ApEvent.class);
 
@@ -31,19 +32,21 @@ public class Calculator {
                 .filter(ApEvent::isUse)
                 .sorted(Comparator.comparingInt(ApEvent::getIncreaseAmount).reversed())
                 .forEach(apEvent -> {
-                    if (apEvent.getIncreaseAmount() > apRemaining.get())
+                    int increaseAmount = (int) (apEvent.getIncreaseAmount() * multiplier);
+
+                    if (increaseAmount > apRemaining.get())
                         return;
 
-                    int timesFitInDelta = apRemaining.intValue() / apEvent.getIncreaseAmount();
+                    int timesFitInDelta = apRemaining.intValue() / increaseAmount;
                     int sievedTimes;
                     // If it fits perfectly, do not sieve it. Be perfectionist. :)
-                    if (timesFitInDelta * apEvent.getIncreaseAmount() == apRemaining.intValue())
+                    if (timesFitInDelta * increaseAmount == apRemaining.intValue())
                         sievedTimes = timesFitInDelta;
                     else
                         sievedTimes = sieveApEvents(apEvent, timesFitInDelta, SIMILAR_ACTIONS_SIEVE_PERCENTAGE);
 
 
-                    long nextApRemaining = apRemaining.get() - sievedTimes * apEvent.getIncreaseAmount();
+                    long nextApRemaining = apRemaining.get() - sievedTimes * increaseAmount;
                     int lastDigitBefore = apRemaining.intValue() % 10;
                     int lastDigitAfter = (int)nextApRemaining % 10;
 
